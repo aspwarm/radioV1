@@ -1,0 +1,121 @@
+
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local playButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+local SoundIdBox = Instance.new("TextBox")
+
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.ResetOnSpawn = false
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(76, 76, 76)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.323406786, 0, 0.19520548, 0)
+Frame.Size = UDim2.new(0, 370, 0, 197)
+Frame.Active = true 
+Frame.Draggable = true
+
+playButton.Name = "playButton"
+playButton.Parent = Frame
+playButton.BackgroundColor3 = Color3.fromRGB(132, 132, 132)
+playButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+playButton.BorderSizePixel = 0
+playButton.Position = UDim2.new(0.186486483, 0, 0.522842646, 0)
+playButton.Size = UDim2.new(0, 200, 0, 50)
+playButton.Font = Enum.Font.SourceSans
+playButton.Text = "PLAY SOUND"
+playButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+playButton.TextSize = 14.000
+
+UICorner.Parent = playButton
+
+SoundIdBox.Name = "SoundIdBox"
+SoundIdBox.Parent = Frame
+SoundIdBox.BackgroundColor3 = Color3.fromRGB(138, 138, 138)
+SoundIdBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+SoundIdBox.BorderSizePixel = 0
+SoundIdBox.Position = UDim2.new(0.186486483, 0, 0.126903549, 0)
+SoundIdBox.Size = UDim2.new(0, 200, 0, 50)
+SoundIdBox.Font = Enum.Font.SourceSans
+SoundIdBox.PlaceholderText = "Enter ID"
+SoundIdBox.Text = ""
+SoundIdBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+SoundIdBox.TextSize = 14.000
+
+-- Scripts:
+
+local function JOUHMXZ_fake_script() -- playButton.LocalScript 
+	local script = Instance.new('LocalScript', playButton)
+
+	-- Local script in the PlayButton
+	local playButton = script.Parent
+	local soundIdBox = playButton.Parent.SoundIdBox
+	
+	-- Create or get the PlaySoundEvent
+	local replicatedStorage = game:GetService("ReplicatedStorage")
+	local playSoundEvent = replicatedStorage:FindFirstChild("PlaySoundEvent")
+	
+	if not playSoundEvent then
+		playSoundEvent = Instance.new("RemoteEvent")
+		playSoundEvent.Name = "PlaySoundEvent"
+		playSoundEvent.Parent = replicatedStorage
+	end
+	
+	playButton.MouseButton1Click:Connect(function()
+		local soundId = soundIdBox.Text
+		if soundId and soundId ~= "" then
+			playSoundEvent:FireServer(soundId)
+		else
+			warn("Please enter a valid sound ID.")
+		end
+	end)
+	
+end
+coroutine.wrap(JOUHMXZ_fake_script)()
+local function IVAQGPV_fake_script() -- ScreenGui.Script 
+	local script = Instance.new('Script', ScreenGui)
+
+	-- Script in StarterGui to handle server-side logic
+	local replicatedStorage = game:GetService("ReplicatedStorage")
+	local playSoundEvent = replicatedStorage:FindFirstChild("PlaySoundEvent")
+	
+	if not playSoundEvent then
+		playSoundEvent = Instance.new("RemoteEvent")
+		playSoundEvent.Name = "PlaySoundEvent"
+		playSoundEvent.Parent = replicatedStorage
+	end
+	
+	playSoundEvent.OnServerEvent:Connect(function(player, soundId)
+		-- Ensure there are no existing sounds named "RadioSound"
+		for _, obj in pairs(game.Workspace:GetChildren()) do
+			if obj:IsA("Sound") and obj.Name == "RadioSound" then
+				obj:Stop()
+				obj:Destroy()
+			end
+		end
+	
+		-- Create and play the new sound
+		local sound = Instance.new("Sound")
+		sound.Name = "RadioSound"
+		sound.SoundId = "rbxassetid://" .. soundId
+		sound.Volume = 1
+		sound.Looped = true
+		sound.Parent = game.Workspace
+	
+		-- Attempt to load the sound and play it
+		local success, errorMessage = pcall(function()
+			sound:Play()
+		end)
+	
+		if not success then
+			warn("Failed to play sound: " .. errorMessage)
+		end
+	end)
+	
+end
+coroutine.wrap(IVAQGPV_fake_script)()
